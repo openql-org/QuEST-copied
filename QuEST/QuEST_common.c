@@ -18,6 +18,10 @@
 # include <stdio.h>
 # include <stdlib.h>
 
+// MAXHOSTNAMELEN is used in getQuESTDefaultSeedKey but in not defined on some OS
+#ifndef MAXHOSTNAMELEN
+#define MAXHOSTNAMELEN 255
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -137,6 +141,7 @@ void getQuESTDefaultSeedKey(unsigned long int *key){
     // for the MPI version, it is ok that all procs will get the same seed as random numbers will only be 
     // used by the master process
 
+
     struct timeval  tv;
     gettimeofday(&tv, NULL);
 
@@ -145,6 +150,8 @@ void getQuESTDefaultSeedKey(unsigned long int *key){
 
     unsigned long int pid = getpid();
     unsigned long int msecs = (unsigned long int) time_in_mill;
+
+
     char hostName[MAXHOSTNAMELEN+1];
     gethostname(hostName, sizeof(hostName));
     unsigned long int hostNameInt = hashString(hostName);
