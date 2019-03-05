@@ -18,7 +18,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 
-// MAXHOSTNAMELEN is used in getQuESTDefaultSeedKey but in not defined on some OS
+// MAXHOSTNAMELEN is used in getQuESTDefaultSeedKey but is not defined (in sys/param.h) on some OS
 #ifndef MAXHOSTNAMELEN
 #define MAXHOSTNAMELEN 255
 #endif
