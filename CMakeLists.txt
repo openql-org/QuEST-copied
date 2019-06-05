@@ -8,8 +8,8 @@ project(QuEST_Project)
 # ----- USER OPTIONS ----------------------------------------------------------
 # -----------------------------------------------------------------------------
 
-set(USER_SOURCE  "tutorial_example.c"  CACHE STRING "Source to build with QuEST library")
-set(OUTPUT_EXE   "demo"  CACHE STRING "Executable to compile to")
+set(USER_SOURCE  "QuantumChannels.c" "tests/channels/ExampleChannels.c" "tests/channels/KraussMap.c" CACHE STRING "Source to build with QuEST library")
+set(OUTPUT_EXE   "channels"  CACHE STRING "Executable to compile to")
 
 option(TESTING "Enable test suite functionality -- requires test suite available" ON)
 set(QuEST_UTIL_DIR_NAME "utilities" CACHE STRING
