@@ -17,7 +17,7 @@ void ApplyOneQubitDephaseChannel(Qureg qureg, const int targetQubit, qreal prob)
 	CalculateOneQubitSparseSuperOperator(&thisChannel);
 	
 	//Apply channel to the qubit
-	ApplyOneQubitChannel_local(qureg, targetQubit, thisChannel.SparseSupOp);	
+	ApplyOneQubitChannel_local(qureg, targetQubit, thisChannel.SupOp);	
 }	
 
 
@@ -39,7 +39,7 @@ void ApplyOneQubitDepolariseChannel(Qureg qureg, const int targetQubit, qreal pr
 	CalculateOneQubitSparseSuperOperator(&thisChannel);
 	
 	//ApplyOneQubitChannel_local(qureg, targetQubit, thisChannel.SparseSupOp);	
-	ApplyOneQubitChannel_nonsparse_local(qureg, targetQubit, thisChannel.SupOp);	
+	ApplyOneQubitChannel_local(qureg, targetQubit, thisChannel.SupOp);	
 }	
 
 
@@ -59,7 +59,7 @@ void ApplyOneQubitDampingChannel(Qureg qureg, const int targetQubit, qreal prob)
 	CalculateOneQubitSparseSuperOperator(&thisChannel);
 	
 	//Apply channel to the qubit
-	ApplyOneQubitChannel_local(qureg, targetQubit, thisChannel.SparseSupOp);	
+	ApplyOneQubitChannel_local(qureg, targetQubit, thisChannel.SupOp);	
 }
 
 

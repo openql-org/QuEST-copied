@@ -37,7 +37,7 @@ void KraussOperator2SuperOperator(OneQubitKraussOperator *A, OneQubitKraussOpera
 // This calculates the sparse represenation of the superoperator
 void CalculateOneQubitSparseSuperOperator(OneQubitChannel *thisChannel);
 
-void ApplyOneQubitChannel_local(Qureg qureg, const int targetQubit, OneQubitSparseSuperOperator supop);
+void ApplyOneQubitChannel_local(Qureg qureg, const int targetQubit, OneQubitSuperOperator supop);
 
 void ApplyOneQubitChannel_nonsparse_local(Qureg qureg, const int targetQubit, OneQubitSuperOperator supop);
 
