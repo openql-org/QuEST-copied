@@ -38,8 +38,8 @@ void ApplyOneQubitDepolariseChannel(Qureg qureg, const int targetQubit, qreal pr
 	//Calculate the sparse representation of the superoperator
 	CalculateOneQubitSparseSuperOperator(&thisChannel);
 	
-	//Apply channel to the qubit
-	ApplyOneQubitChannel_local(qureg, targetQubit, thisChannel.SparseSupOp);	
+	//ApplyOneQubitChannel_local(qureg, targetQubit, thisChannel.SparseSupOp);	
+	ApplyOneQubitChannel_nonsparse_local(qureg, targetQubit, thisChannel.SupOp);	
 }	
 
 

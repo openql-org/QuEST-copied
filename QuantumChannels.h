@@ -39,6 +39,8 @@ void CalculateOneQubitSparseSuperOperator(OneQubitChannel *thisChannel);
 
 void ApplyOneQubitChannel_local(Qureg qureg, const int targetQubit, OneQubitSparseSuperOperator supop);
 
+void ApplyOneQubitChannel_nonsparse_local(Qureg qureg, const int targetQubit, OneQubitSuperOperator supop);
+
 void ApplyArbitraryKraussMap(Qureg qureg, const int targetQubit, OneQubitKraussOperator operators[4]);
 
 #endif

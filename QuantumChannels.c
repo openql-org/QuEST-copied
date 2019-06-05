@@ -25,9 +25,6 @@ void CalculateOneQubitSparseSuperOperator(OneQubitChannel *thisChannel)
 	thisChannel->SparseSupOp.length = length;
 }
 
-
-
-
 void ApplyOneQubitChannel_local(Qureg qureg, const int targetQubit, OneQubitSparseSuperOperator supop) {
 
     const long long int numTasks = qureg.numAmpsPerChunk;
@@ -40,7 +37,6 @@ void ApplyOneQubitChannel_local(Qureg qureg, const int targetQubit, OneQubitSpar
 
 // Elements of the density matrix are denoted as ((A,C),(B,D))	
 	long long int thisIndexes[4];
-	
 	qreal rhoRe[4], rhoIm[4], newrhoRe[4], newrhoIm[4];
 
 	int currentRow, currentCol;
@@ -68,6 +64,57 @@ void ApplyOneQubitChannel_local(Qureg qureg, const int targetQubit, OneQubitSpar
 				//IMPLEMENTED ONLY FOR REAL SUPEROPERATORS -- straightforward to extend
 				newrhoRe[currentCol] += supop.valuesRe[i]*rhoRe[currentRow];
 				newrhoIm[currentCol] += supop.valuesRe[i]*rhoIm[currentRow];
+			}
+					
+			//Update the density matrix
+			for(int i = 0; i < 4; i++){
+				qureg.stateVec.real[thisIndexes[i]] = newrhoRe[i];
+				qureg.stateVec.imag[thisIndexes[i]] = newrhoIm[i];
+			}
+		}
+    }  
+}
+
+
+
+
+void ApplyOneQubitChannel_nonsparse_local(Qureg qureg, const int targetQubit, OneQubitSuperOperator supop) {
+
+    const long long int numTasks = qureg.numAmpsPerChunk;
+    long long int innerMask = 1LL << targetQubit;
+    long long int outerMask = 1LL << (targetQubit + (qureg.numQubitsRepresented));
+    long long int totMask = innerMask|outerMask;
+
+    long long int thisTask;
+	
+
+// Elements of the density matrix are denoted as ((A,C),(B,D))	
+	long long int thisIndexes[4];
+	qreal rhoRe[4], rhoIm[4], newrhoRe[4], newrhoIm[4];
+
+    for (thisTask=0; thisTask<numTasks; thisTask++){
+		if ((thisTask&totMask)==0){ //this element relates to targetQubit in state 0 -- upper diagonal
+			//Copy elements of the density matrix into a vector |rho>
+			thisIndexes[0] = thisTask;					// element A -- upper left
+			thisIndexes[1] = thisTask | innerMask;		// element B -- lower left
+			thisIndexes[2] = thisTask | outerMask;		// element C -- upper right
+			thisIndexes[3] = thisTask | totMask;		// element D -- lower right	
+			
+			//store current values of the density matrix
+			//and set new values to 0
+			for(int i = 0; i < 4; i++){
+				rhoRe[i] = qureg.stateVec.real[thisIndexes[i]];
+				newrhoRe[i] = 0.;
+				rhoIm[i] = qureg.stateVec.imag[thisIndexes[i]];
+				newrhoIm[i] = 0.;
+			}
+					
+			for(int i = 0; i < 4; i++){
+				for(int j = 0; j < 4; j++){
+					//IMPLEMENTED ONLY FOR REAL SUPEROPERATORS -- straightforward to extend
+					newrhoRe[i] += supop.real[i][j]*rhoRe[j];
+					newrhoIm[i] += supop.real[i][j]*rhoIm[j];
+				}
 			}
 					
 			//Update the density matrix
