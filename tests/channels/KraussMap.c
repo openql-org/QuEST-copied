@@ -60,10 +60,10 @@ int main (int narg, char *varg[]) {
 t = clock();
 	for(int i = 0; i < N; i++)
 	{
-		ApplyOneQubitDepolariseChannel(qubitsA, i, prob);
+		//ApplyOneQubitDepolariseChannel(qubitsA, i, prob);
 		//ApplyOneQubitDephaseChannel(qubitsA, i, prob);
 		//ApplyOneQubitDampingChannel(qubitsA, i, prob);
-		//ApplyOneQubitUnitalChannel(qubitsA, i, depolarisePrefactors);
+		ApplyOneQubitUnitalChannel(qubitsA, i, depolarisePrefactors);
 	} 
 t = clock() - t; 
     time_taken = ((double)t)/CLOCKS_PER_SEC;
@@ -72,10 +72,10 @@ t = clock() - t;
 t = clock(); 
 	for(int i = 0; i < N; i++)
 	{
-		applyOneQubitDepolariseError(qubitsB, i, prob);
+		//applyOneQubitDepolariseError(qubitsB, i, prob);
 		//applyOneQubitDephaseError(qubitsB, i, prob);
 		//applyOneQubitDampingError(qubitsB, i, prob);
-		//applyOneQubitDepolariseError(qubitsB, i, prob);
+		applyOneQubitDepolariseError(qubitsB, i, prob);
 	} 
 t = clock() - t; 
 	time_taken = ((double)t)/CLOCKS_PER_SEC;

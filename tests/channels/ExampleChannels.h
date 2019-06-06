@@ -13,6 +13,4 @@ void ApplyOneQubitDampingChannel(Qureg qureg, const int targetQubit, qreal prob)
 
 void ApplyOneQubitUnitalChannel(Qureg qureg, const int targetQubit, qreal prefactors[4]);
 
-void ApplyArbitraryKraussMap(Qureg qureg, const int targetQubit, OneQubitKraussOperator operators[4]);
-
 #endif

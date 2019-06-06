@@ -14,33 +14,15 @@ typedef struct OneQubitSuperOperator
 {
 	qreal real[4][4];
 	qreal imag[4][4];
+	int isComplex;
 } OneQubitSuperOperator;
 
-typedef struct OneQubitSparseSuperOperator
-{
-	int length;
-	int indexes[16][2];
-	qreal valuesRe[16];
-	qreal valuesIm[16];
-} OneQubitSparseSuperOperator;
-
-
-typedef struct OneQubitChannel
-{	
-	OneQubitSuperOperator SupOp;
-	OneQubitSparseSuperOperator SparseSupOp;
-} OneQubitChannel;
 
 // This calculates the superoperator from the Krauss operators A and B and adds it to the superoperator C
 void KraussOperator2SuperOperator(OneQubitKraussOperator *A, OneQubitKraussOperator *B, OneQubitSuperOperator *C);
 
-// This calculates the sparse represenation of the superoperator
-void CalculateOneQubitSparseSuperOperator(OneQubitChannel *thisChannel);
-
 void ApplyOneQubitChannel_local(Qureg qureg, const int targetQubit, OneQubitSuperOperator supop);
 
-void ApplyOneQubitChannel_nonsparse_local(Qureg qureg, const int targetQubit, OneQubitSuperOperator supop);
-
-void ApplyArbitraryKraussMap(Qureg qureg, const int targetQubit, OneQubitKraussOperator operators[4]);
+void ApplyArbitraryKraussMap(Qureg qureg, const int targetQubit, OneQubitKraussOperator *operators, int numberOfOperators);
 
 #endif
