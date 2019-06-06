@@ -63,7 +63,8 @@ t = clock();
 		//ApplyOneQubitDepolariseChannel(qubitsA, i, prob);
 		//ApplyOneQubitDephaseChannel(qubitsA, i, prob);
 		//ApplyOneQubitDampingChannel(qubitsA, i, prob);
-		ApplyOneQubitUnitalChannel(qubitsA, i, depolarisePrefactors);
+		//ApplyOneQubitUnitalChannel(qubitsA, i, depolarisePrefactors);
+		rotXtest(qubitsA, i);
 	} 
 t = clock() - t; 
     time_taken = ((double)t)/CLOCKS_PER_SEC;
@@ -75,7 +76,8 @@ t = clock();
 		//applyOneQubitDepolariseError(qubitsB, i, prob);
 		//applyOneQubitDephaseError(qubitsB, i, prob);
 		//applyOneQubitDampingError(qubitsB, i, prob);
-		applyOneQubitDepolariseError(qubitsB, i, prob);
+		//applyOneQubitDepolariseError(qubitsB, i, prob);
+		rotateX (qubitsB, i, 1.);
 	} 
 t = clock() - t; 
 	time_taken = ((double)t)/CLOCKS_PER_SEC;

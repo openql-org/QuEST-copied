@@ -58,3 +58,24 @@ void ApplyOneQubitDampingChannel(Qureg qureg, const int targetQubit, qreal prob)
 	//Apply channel to the qubit
 	ApplyOneQubitChannel_local(qureg, targetQubit, supop);	
 }
+
+void rotXtest(Qureg qureg, const int targetQubit)
+{	
+	//Rotate X by theta=1. angle using Kraus operators
+
+	//Define the channel via its superoperator
+	OneQubitSuperOperator supop = {
+		.real = {
+			{0.770151, 0., 0., 0.229849}, {0., 0.770151, 0.229849, 0.},
+			{0., 0.229849, 0.770151, 0.}, {0.229849, 0., 0., 0.770151}
+			},
+		.imag = {
+			{0., -0.420735, 0.420735, 0.}, {-0.420735, 0., 0., 0.420735},
+			{0.420735, 0., 0., -0.420735}, {0., 0.420735, -0.420735, 0.}
+			},
+		.isComplex = 1
+	};
+	
+	//Apply channel to the qubit
+	ApplyOneQubitChannel_local(qureg, targetQubit, supop);	
+}

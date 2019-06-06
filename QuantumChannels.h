@@ -4,11 +4,11 @@
 #include <stdio.h>
 #include "QuEST.h"
 
-typedef struct OneQubitKraussOperator
+typedef struct OneQubitKrausOperator
 {
 	qreal real[2][2];
 	qreal imag[2][2];
-} OneQubitKraussOperator;
+} OneQubitKrausOperator;
 
 typedef struct OneQubitSuperOperator
 {
@@ -18,12 +18,12 @@ typedef struct OneQubitSuperOperator
 } OneQubitSuperOperator;
 
 
-// This calculates the superoperator from the Krauss operators A and B and adds it to the superoperator C
-void KraussOperator2SuperOperator(OneQubitKraussOperator *A, OneQubitKraussOperator *B, OneQubitSuperOperator *C);
+// This calculates the superoperator from the Kraus operators A and B and adds it to the superoperator C
+void KrausOperator2SuperOperator(OneQubitKrausOperator *A, OneQubitKrausOperator *B, OneQubitSuperOperator *C);
 
 void ApplyOneQubitChannel_local(Qureg qureg, const int targetQubit, OneQubitSuperOperator supop);
 
-void ApplyOneQubitKraussMap(Qureg qureg, const int targetQubit, OneQubitKraussOperator *operators, int numberOfOperators);
+void ApplyOneQubitKrausMap(Qureg qureg, const int targetQubit, OneQubitKrausOperator *operators, int numberOfOperators);
 
 void ApplyOneQubitUnitalChannel(Qureg qureg, const int targetQubit, qreal probabilities[4]);
 

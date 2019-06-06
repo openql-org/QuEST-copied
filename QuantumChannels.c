@@ -1,8 +1,5 @@
 #include "QuantumChannels.h"
 
-
-
-
 void ApplyOneQubitChannel_local(Qureg qureg, const int targetQubit, OneQubitSuperOperator supop) {
 
     const long long int numTasks = qureg.numAmpsPerChunk;
@@ -18,19 +15,18 @@ void ApplyOneQubitChannel_local(Qureg qureg, const int targetQubit, OneQubitSupe
 	long long int indA, indB, indC, indD;
 	
 	//Unpack primitives of the super operator
+	const int isComplex = supop.isComplex;
 	const qreal
 	r0c0=supop.real[0][0], r0c1=supop.real[0][1], r0c2=supop.real[0][2], r0c3=supop.real[0][3],
 	r1c0=supop.real[1][0], r1c1=supop.real[1][1], r1c2=supop.real[1][2], r1c3=supop.real[1][3],
 	r2c0=supop.real[2][0], r2c1=supop.real[2][1], r2c2=supop.real[2][2], r2c3=supop.real[2][3],
 	r3c0=supop.real[3][0], r3c1=supop.real[3][1], r3c2=supop.real[3][2], r3c3=supop.real[3][3];
 	
-	int isComplex = supop.isComplex;
-	
-	if (isComplex == 1){
-		printf("Complex superoperator not yet implemented\n");
-		//initialise here
-		//qreal Imr0c0=supop.imag[0][0] ...... 
-	}
+	const qreal
+	Imr0c0=supop.imag[0][0], Imr0c1=supop.imag[0][1], Imr0c2=supop.imag[0][2], Imr0c3=supop.imag[0][3],
+	Imr1c0=supop.imag[1][0], Imr1c1=supop.imag[1][1], Imr1c2=supop.imag[1][2], Imr1c3=supop.imag[1][3],
+	Imr2c0=supop.imag[2][0], Imr2c1=supop.imag[2][1], Imr2c2=supop.imag[2][2], Imr2c3=supop.imag[2][3],
+	Imr3c0=supop.imag[3][0], Imr3c1=supop.imag[3][1], Imr3c2=supop.imag[3][2], Imr3c3=supop.imag[3][3];
 	
 	
     for (thisTask=0; thisTask<numTasks; thisTask++){
@@ -66,17 +62,27 @@ void ApplyOneQubitChannel_local(Qureg qureg, const int targetQubit, OneQubitSupe
 			qureg.stateVec.real[indD] = r3c0*rhoReA + r3c1*rhoReB + r3c2*rhoReC + r3c3*rhoReD;
 			qureg.stateVec.imag[indD] = r3c0*rhoImA + r3c1*rhoImB + r3c2*rhoImC + r3c3*rhoImD;
 			
-		//if (isComplex == 1){
-			//do the multiplication here
-		//}		
-
+			if (isComplex == 1){
+				qureg.stateVec.real[indA] -= Imr0c0*rhoImA + Imr0c1*rhoImB + Imr0c2*rhoImC + Imr0c3*rhoImD;
+				qureg.stateVec.imag[indA] += Imr0c0*rhoReA + Imr0c1*rhoReB + Imr0c2*rhoReC + Imr0c3*rhoReD;
+				
+				qureg.stateVec.real[indB] -= Imr1c0*rhoImA + Imr1c1*rhoImB + Imr1c2*rhoImC + Imr1c3*rhoImD;
+				qureg.stateVec.imag[indB] += Imr1c0*rhoReA + Imr1c1*rhoReB + Imr1c2*rhoReC + Imr1c3*rhoReD;
+				
+				qureg.stateVec.real[indC] -= Imr2c0*rhoImA + Imr2c1*rhoImB + Imr2c2*rhoImC + Imr2c3*rhoImD;
+				qureg.stateVec.imag[indC] += Imr2c0*rhoReA + Imr2c1*rhoReB + Imr2c2*rhoReC + Imr2c3*rhoReD;
+				
+				qureg.stateVec.real[indD] -= Imr3c0*rhoImA + Imr3c1*rhoImB + Imr3c2*rhoImC + Imr3c3*rhoImD;
+				qureg.stateVec.imag[indD] += Imr3c0*rhoReA + Imr3c1*rhoReB + Imr3c2*rhoReC + Imr3c3*rhoReD;
+			}
+			
 		}
     }  
 }
 
 
 
-void KraussOperator2SuperOperator(OneQubitKraussOperator *A, OneQubitKraussOperator *B, OneQubitSuperOperator *C)
+void KrausOperator2SuperOperator(OneQubitKrausOperator *A, OneQubitKrausOperator *B, OneQubitSuperOperator *C)
 { // This calculates the tensor product      C += conjugate(A) (x) B   and adds the result to the superopertor C
     qreal tempAr, tempAi, tempBr, tempBi;
   
@@ -107,17 +113,17 @@ void KraussOperator2SuperOperator(OneQubitKraussOperator *A, OneQubitKraussOpera
 
 
 
-void ApplyOneQubitKraussMap(Qureg qureg, const int targetQubit, OneQubitKraussOperator *operators, int numberOfOperators)
+void ApplyOneQubitKrausMap(Qureg qureg, const int targetQubit, OneQubitKrausOperator *operators, int numberOfOperators)
 {
-	//DO the checks on the Krauss operators
+	//DO the checks on the Kraus operators
 	
 	//Initialize the channel with 0 superoperator
 	OneQubitSuperOperator supop = {.real = {0}, .imag = {0}, .isComplex = 0 };
 	
 	
-	//turn the Krauss operators into a superoperator
+	//turn the Kraus operators into a superoperator
 	for (int i = 0; i < numberOfOperators; i++) {
-		KraussOperator2SuperOperator(&operators[i], &operators[i], &supop);
+		KrausOperator2SuperOperator(&operators[i], &operators[i], &supop);
 	}
 
 	/*printf("The super operator of the channel is:\n");
@@ -144,14 +150,14 @@ void ApplyOneQubitUnitalChannel(Qureg qureg, const int targetQubit, qreal probab
 		sqrt(probabilities[2]),
 		sqrt(probabilities[3])
 	};
-	OneQubitKraussOperator Pauli0 = {.real = {{prefactors[0] * 1, 0},{0, prefactors[0] * 1}}, .imag = {0}};
-	OneQubitKraussOperator Pauli1 = {.real = {{0, prefactors[1] * 1},{prefactors[1] * 1, 0}}, .imag = {0}};
-	OneQubitKraussOperator Pauli2 = {.imag = {{0, prefactors[2] * -1},{prefactors[2] * 1, 0}}, .real = {0}};
-	OneQubitKraussOperator Pauli3 = {.real = {{prefactors[2] * 1, 0},{0, prefactors[2] * -1}}, .imag = {0}};
+	OneQubitKrausOperator Pauli0 = {.real = {{prefactors[0] * 1, 0},{0, prefactors[0] * 1}}, .imag = {0}};
+	OneQubitKrausOperator Pauli1 = {.real = {{0, prefactors[1] * 1},{prefactors[1] * 1, 0}}, .imag = {0}};
+	OneQubitKrausOperator Pauli2 = {.imag = {{0, prefactors[2] * -1},{prefactors[2] * 1, 0}}, .real = {0}};
+	OneQubitKrausOperator Pauli3 = {.real = {{prefactors[2] * 1, 0},{0, prefactors[2] * -1}}, .imag = {0}};
 	
 	
-	OneQubitKraussOperator operators[4] = {Pauli0, Pauli1, Pauli2, Pauli3};
+	OneQubitKrausOperator operators[4] = {Pauli0, Pauli1, Pauli2, Pauli3};
 	
-	ApplyOneQubitKraussMap(qureg, targetQubit, operators, 4);
+	ApplyOneQubitKrausMap(qureg, targetQubit, operators, 4);
 	
 }
