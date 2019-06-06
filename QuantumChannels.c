@@ -140,15 +140,15 @@ void ApplyOneQubitKrausMap(Qureg qureg, const int targetQubit, OneQubitKrausOper
 }
 
 
-void ApplyOneQubitUnitalChannel(Qureg qureg, const int targetQubit, qreal probabilities[4])
+void ApplyOneQubitUnitalChannel(Qureg qureg, const int targetQubit, qreal probX, qreal probY, qreal probZ)
 {
 	//DO the checks on the prefactros to verify that the channel is unital and completely positive
 	
 	qreal prefactors[4] = {
-		sqrt(probabilities[0]),
-		sqrt(probabilities[1]),
-		sqrt(probabilities[2]),
-		sqrt(probabilities[3])
+		sqrt(1-(probX + probY + probZ)),
+		sqrt(probX),
+		sqrt(probY),
+		sqrt(probZ)
 	};
 	OneQubitKrausOperator Pauli0 = {.real = {{prefactors[0] * 1, 0},{0, prefactors[0] * 1}}, .imag = {0}};
 	OneQubitKrausOperator Pauli1 = {.real = {{0, prefactors[1] * 1},{prefactors[1] * 1, 0}}, .imag = {0}};

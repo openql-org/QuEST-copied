@@ -52,7 +52,6 @@ int main (int narg, char *varg[]) {
 	}
 	
 	qreal prob = 0.3;
-	qreal depolarisePrefactors[4] = {1-prob, prob/3., prob/3., prob/3.};
 	
 	clock_t t; 
 	double time_taken;
@@ -63,8 +62,8 @@ t = clock();
 		//ApplyOneQubitDepolariseChannel(qubitsA, i, prob);
 		//ApplyOneQubitDephaseChannel(qubitsA, i, prob);
 		//ApplyOneQubitDampingChannel(qubitsA, i, prob);
-		//ApplyOneQubitUnitalChannel(qubitsA, i, depolarisePrefactors);
-		rotXtest(qubitsA, i);
+		ApplyOneQubitUnitalChannel(qubitsA, i, prob/3., prob/3., prob/3.);
+		//rotXtest(qubitsA, i);
 	} 
 t = clock() - t; 
     time_taken = ((double)t)/CLOCKS_PER_SEC;
@@ -76,8 +75,8 @@ t = clock();
 		//applyOneQubitDepolariseError(qubitsB, i, prob);
 		//applyOneQubitDephaseError(qubitsB, i, prob);
 		//applyOneQubitDampingError(qubitsB, i, prob);
-		//applyOneQubitDepolariseError(qubitsB, i, prob);
-		rotateX (qubitsB, i, 1.);
+		applyOneQubitDepolariseError(qubitsB, i, prob);
+		//rotateX (qubitsB, i, 1.);
 	} 
 t = clock() - t; 
 	time_taken = ((double)t)/CLOCKS_PER_SEC;

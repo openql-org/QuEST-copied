@@ -25,6 +25,6 @@ void ApplyOneQubitChannel_local(Qureg qureg, const int targetQubit, OneQubitSupe
 
 void ApplyOneQubitKrausMap(Qureg qureg, const int targetQubit, OneQubitKrausOperator *operators, int numberOfOperators);
 
-void ApplyOneQubitUnitalChannel(Qureg qureg, const int targetQubit, qreal probabilities[4]);
+void ApplyOneQubitUnitalChannel(Qureg qureg, const int targetQubit, qreal probX, qreal probY, qreal probZ);
 
 #endif
