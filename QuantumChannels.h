@@ -23,6 +23,8 @@ void KraussOperator2SuperOperator(OneQubitKraussOperator *A, OneQubitKraussOpera
 
 void ApplyOneQubitChannel_local(Qureg qureg, const int targetQubit, OneQubitSuperOperator supop);
 
-void ApplyArbitraryKraussMap(Qureg qureg, const int targetQubit, OneQubitKraussOperator *operators, int numberOfOperators);
+void ApplyOneQubitKraussMap(Qureg qureg, const int targetQubit, OneQubitKraussOperator *operators, int numberOfOperators);
+
+void ApplyOneQubitUnitalChannel(Qureg qureg, const int targetQubit, qreal probabilities[4]);
 
 #endif

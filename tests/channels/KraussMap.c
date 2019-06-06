@@ -52,7 +52,7 @@ int main (int narg, char *varg[]) {
 	}
 	
 	qreal prob = 0.3;
-	qreal depolarisePrefactors[4] = {sqrt(1-prob), sqrt(prob/3.), sqrt(prob/3.), sqrt(prob/3.)};
+	qreal depolarisePrefactors[4] = {1-prob, prob/3., prob/3., prob/3.};
 	
 	clock_t t; 
 	double time_taken;
