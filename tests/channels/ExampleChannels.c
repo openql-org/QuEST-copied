@@ -79,3 +79,45 @@ void rotXtest(Qureg qureg, const int targetQubit)
 	//Apply channel to the qubit
 	ApplyOneQubitChannel_local(qureg, targetQubit, supop);	
 }
+
+
+void ApplyTwoQubitDephaseChannel(Qureg qureg, const int qubit1, const int qubit2, qreal prob)
+{
+	TwoQubitSuperOperator thisSupOp = {.real = {
+{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+
+{0, 1 - (4*prob)/3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+
+{0, 0, 1 - (4*prob)/3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+
+{0, 0, 0, 1 - (4*prob)/3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+
+{0, 0, 0, 0, 1 - (4*prob)/3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+
+{0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+
+{0, 0, 0, 0, 0, 0, 1 - (4*prob)/3, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+
+{0, 0, 0, 0, 0, 0, 0, 1 - (4*prob)/3, 0, 0, 0, 0, 0, 0, 0, 0},
+
+{0, 0, 0, 0, 0, 0, 0, 0, 1 - (4*prob)/3, 0, 0, 0, 0, 0, 0, 0},
+
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 1 - (4*prob)/3, 0, 0, 0, 0, 0, 0},
+
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 - (4*prob)/3, 0, 0, 0, 0},
+
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 - (4*prob)/3, 0, 0, 0},
+
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 - (4*prob)/3, 0, 0},
+
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 - (4*prob)/3, 0},
+
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
+	},
+	.isComplex = 0};
+  
+  ApplyTwoQubitChannel_local(qureg, qubit1, qubit2, thisSupOp);
+  
+}

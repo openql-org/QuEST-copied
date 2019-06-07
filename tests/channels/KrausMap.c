@@ -44,7 +44,7 @@ int main (int narg, char *varg[]) {
 	const int N = 11;
     Qureg qubitsA = createDensityQureg(N, env);
 	Qureg qubitsB = createDensityQureg(N, env);
-	
+		
 	for(int i = 0; i < N; i++)
 	{
 		rotateX (qubitsA, i, 0.12134234*i);
@@ -59,11 +59,14 @@ int main (int narg, char *varg[]) {
 t = clock();
 	for(int i = 0; i < N; i++)
 	{
-		//ApplyOneQubitDepolariseChannel(qubitsA, i, prob);
+		ApplyOneQubitDepolariseChannel(qubitsA, i, prob);
 		//ApplyOneQubitDephaseChannel(qubitsA, i, prob);
 		//ApplyOneQubitDampingChannel(qubitsA, i, prob);
-		ApplyOneQubitUnitalChannel(qubitsA, i, prob/3., prob/3., prob/3.);
+		//ApplyOneQubitUnitalChannel(qubitsA, i, prob/3., prob/3., prob/3.);
 		//rotXtest(qubitsA, i);
+		for(int j = 0; j < N; j++) {
+			//if (i!=j) ApplyTwoQubitDephaseChannel(qubitsA, i, j,0.1);
+		}
 	} 
 t = clock() - t; 
     time_taken = ((double)t)/CLOCKS_PER_SEC;
@@ -72,11 +75,14 @@ t = clock() - t;
 t = clock(); 
 	for(int i = 0; i < N; i++)
 	{
-		//applyOneQubitDepolariseError(qubitsB, i, prob);
+		applyOneQubitDepolariseError(qubitsB, i, prob);
 		//applyOneQubitDephaseError(qubitsB, i, prob);
 		//applyOneQubitDampingError(qubitsB, i, prob);
-		applyOneQubitDepolariseError(qubitsB, i, prob);
+		//applyOneQubitDepolariseError(qubitsB, i, prob);
 		//rotateX (qubitsB, i, 1.);
+		for(int j = 0; j < N; j++) {
+			//if (i!=j) applyTwoQubitDephaseError(qubitsB, i, j,0.1);
+		}
 	} 
 t = clock() - t; 
 	time_taken = ((double)t)/CLOCKS_PER_SEC;

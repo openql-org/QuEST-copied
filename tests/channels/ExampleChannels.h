@@ -11,6 +11,8 @@ void ApplyOneQubitDepolariseChannel(Qureg qureg, const int targetQubit, qreal pr
 
 void ApplyOneQubitDampingChannel(Qureg qureg, const int targetQubit, qreal prob);
 
+void ApplyTwoQubitDephaseChannel(Qureg qureg, const int qubit1, const int qubit2, qreal prob);
+
 void rotXtest(Qureg qureg, const int targetQubit);
 
 #endif
