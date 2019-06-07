@@ -1,11 +1,13 @@
 #include "QuantumChannels.h"
 
+
+
 void ApplyOneQubitChannel_local(Qureg qureg, const int targetQubit, OneQubitSuperOperator supop) {
 
     const long long int numTasks = qureg.numAmpsPerChunk;
-    long long int innerMask = 1LL << targetQubit;
-    long long int outerMask = 1LL << (targetQubit + (qureg.numQubitsRepresented));
-    long long int totMask = innerMask|outerMask;
+    const long long int innerMask = 1LL << targetQubit;
+    const long long int outerMask = 1LL << (targetQubit + (qureg.numQubitsRepresented));
+    const long long int totMask = innerMask|outerMask;
 
     long long int thisTask;
 	
@@ -35,9 +37,9 @@ void ApplyOneQubitChannel_local(Qureg qureg, const int targetQubit, OneQubitSupe
 			indA = thisTask;					// element A -- upper left
 			indB = thisTask | innerMask;		// element B -- lower left
 			indC = thisTask | outerMask;		// element C -- upper right
-			indD = thisTask | totMask;		// element D -- lower right	
+			indD = thisTask | totMask;			// element D -- lower right	
 			
-			//store current values of the density matrix
+			//store current values
 			//i.e., copy elements of the density matrix into a vector |rho>
 			rhoReA = qureg.stateVec.real[indA];
 			rhoReB = qureg.stateVec.real[indB];
@@ -49,7 +51,7 @@ void ApplyOneQubitChannel_local(Qureg qureg, const int targetQubit, OneQubitSupe
 			rhoImC = qureg.stateVec.imag[indC];
 			rhoImD = qureg.stateVec.imag[indD];
 		
-			// apply the superoperator to |rho>
+			// apply the superoperator matrix to the vector |rho>
 			qureg.stateVec.real[indA] = r0c0*rhoReA + r0c1*rhoReB + r0c2*rhoReC + r0c3*rhoReD;
 			qureg.stateVec.imag[indA] = r0c0*rhoImA + r0c1*rhoImB + r0c2*rhoImC + r0c3*rhoImD;
 			
@@ -82,21 +84,60 @@ void ApplyOneQubitChannel_local(Qureg qureg, const int targetQubit, OneQubitSupe
 
 
 
+void KrausOperatorMultiply(OneQubitKrausOperator *A, OneQubitKrausOperator *B, OneQubitKrausOperator *C) 
+{ 	// This calculates the matrix product C += ConjugateTranspose(A) x B and adds the result to C
+	const int N = 2;
+	qreal tempAr, tempAi, tempBr, tempBi; 
+    for (int i = 0; i < N; i++) { 
+        for (int j = 0; j < N; j++) { 
+            for (int k = 0; k < N; k++) {
+				tempAr = A->real[k][i];  //because it is the conjugate transpose of A
+				tempAi = -A->imag[k][i]; //because it is the conjugate transpose of A
+				tempBr = B->real[k][j];
+				tempBi = B->imag[k][j];
+				C->real[i][j] += tempAr*tempBr - tempAi*tempBi;
+				C->imag[i][j] += tempAr*tempBi + tempAi*tempBr;
+			}	 
+		}
+	}
+} 
+
+int ValidateOneQubitKrausMap(OneQubitKrausOperator *operators, int numberOfOperators)
+{
+		const int N = 2;
+		OneQubitKrausOperator result = {.real = {0}, .imag = {0}};
+		OneQubitKrausOperator id2 = {.real = {{1.,0.},{0.,1.}}, .imag = {0}};
+		
+		for (int i = 0; i < numberOfOperators; i++) {
+			KrausOperatorMultiply(&operators[i], &operators[i], &result);
+		}
+		
+		qreal distance = 0., re, im;
+		// calculate the Hilbert-Schmidt distance between the
+		// result and the identity matrix
+		for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+			re = result.real[i][j] - id2.real[i][j];
+			im = result.imag[i][j] - id2.imag[i][j];
+			distance += fabs(re)*fabs(re) + fabs(im)*fabs(im);
+		}
+		}
+		
+		return(distance != 0.);
+}
+
+
 void KrausOperator2SuperOperator(OneQubitKrausOperator *A, OneQubitKrausOperator *B, OneQubitSuperOperator *C)
 { // This calculates the tensor product      C += conjugate(A) (x) B   and adds the result to the superopertor C
     qreal tempAr, tempAi, tempBr, tempBi;
-  
-    for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < 2; j++) { 
-			for (int k = 0; k < 2; k++) { 
-                for (int l = 0; l < 2; l++) { 
-                    // Each element of matrix A is 
-                    // multiplied by the matrix B 
-                    // and stored as Matrix C 
+	const int N = 2;
+	
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) { 
+			for (int k = 0; k < N; k++) { 
+                for (int l = 0; l < N; l++) { 
 					tempAr = A->real[i][j];
-					tempAi = A->imag[i][j];
-					// this calculates the conjugate of A
-					tempAi = -tempAi;
+					tempAi = -A->imag[i][j]; // minus -- conjugate of A
 					tempBr = B->real[k][l];
 					tempBi = B->imag[k][l];
                     C->real[i*2 + k][j*2 + l] +=  tempAr * tempBr - tempAi * tempBi;
@@ -114,26 +155,21 @@ void KrausOperator2SuperOperator(OneQubitKrausOperator *A, OneQubitKrausOperator
 
 
 void ApplyOneQubitKrausMap(Qureg qureg, const int targetQubit, OneQubitKrausOperator *operators, int numberOfOperators)
-{
-	//DO the checks on the Kraus operators
+{   
+	// Validate the Kraus map
+	if ( ValidateOneQubitKrausMap(operators, numberOfOperators) )
+	{ printf("The specified Kraus map is not a completely positive, trace preserving map\n");}
+    // This if the test is not passed, it could still be allowed
+	// to do the calculation --> the resulting rho is not physical
 	
 	//Initialize the channel with 0 superoperator
 	OneQubitSuperOperator supop = {.real = {0}, .imag = {0}, .isComplex = 0 };
-	
 	
 	//turn the Kraus operators into a superoperator
 	for (int i = 0; i < numberOfOperators; i++) {
 		KrausOperator2SuperOperator(&operators[i], &operators[i], &supop);
 	}
 
-	/*printf("The super operator of the channel is:\n");
-	for (int i = 0; i < 4; i++) {
-		for (int k = 0; k < 4; k++) { 
-			printf("%f %f    ", supop.real[i][k], supop.imag[i][k]);
-		}
-		printf("\n");
-	}*/
-	
 	//Apply the superoperator to the qubit
 	ApplyOneQubitChannel_local(qureg, targetQubit, supop);	
 	
@@ -142,8 +178,10 @@ void ApplyOneQubitKrausMap(Qureg qureg, const int targetQubit, OneQubitKrausOper
 
 void ApplyOneQubitUnitalChannel(Qureg qureg, const int targetQubit, qreal probX, qreal probY, qreal probZ)
 {
-	//DO the checks on the prefactros to verify that the channel is unital and completely positive
+	// validate the probabilities here
+	// not necessary to valideate -- the resulting Kraus operators will be validated anyway
 	
+	// Turn the probabilities into Kraus operators
 	qreal prefactors[4] = {
 		sqrt(1-(probX + probY + probZ)),
 		sqrt(probX),
@@ -155,9 +193,7 @@ void ApplyOneQubitUnitalChannel(Qureg qureg, const int targetQubit, qreal probX,
 	OneQubitKrausOperator Pauli2 = {.imag = {{0, prefactors[2] * -1},{prefactors[2] * 1, 0}}, .real = {0}};
 	OneQubitKrausOperator Pauli3 = {.real = {{prefactors[2] * 1, 0},{0, prefactors[2] * -1}}, .imag = {0}};
 	
-	
 	OneQubitKrausOperator operators[4] = {Pauli0, Pauli1, Pauli2, Pauli3};
-	
 	ApplyOneQubitKrausMap(qureg, targetQubit, operators, 4);
 	
 }
