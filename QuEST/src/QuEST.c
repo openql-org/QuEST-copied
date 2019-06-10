@@ -708,7 +708,7 @@ void OneQubitKrausOperator2SuperOperator(OneQubitKrausOperator *A, OneQubitKraus
     } 
 }
 
-void ApplyOneQubitKrausMap(Qureg qureg, const int targetQubit, OneQubitKrausOperator *operators, int numberOfOperators)
+void applyOneQubitKrausMap(Qureg qureg, const int targetQubit, OneQubitKrausOperator *operators, int numberOfOperators)
 {   
 	validateDensityMatrQureg(qureg, __func__);
     validateTarget(qureg, targetQubit, __func__);
@@ -726,7 +726,7 @@ void ApplyOneQubitKrausMap(Qureg qureg, const int targetQubit, OneQubitKrausOper
 	densmatr_OneQubitChannel(qureg, targetQubit, supop);	
 }
 
-void ApplyOneQubitPauliChannel(Qureg qureg, const int targetQubit, qreal probX, qreal probY, qreal probZ)
+void applyOneQubitPauliChannel(Qureg qureg, const int targetQubit, qreal probX, qreal probY, qreal probZ)
 {
 	validateDensityMatrQureg(qureg, __func__);
     validateTarget(qureg, targetQubit, __func__);
@@ -745,7 +745,7 @@ void ApplyOneQubitPauliChannel(Qureg qureg, const int targetQubit, qreal probX, 
 	OneQubitKrausOperator Pauli3 = {.real = {{prefactors[3] * 1, 0},{0, prefactors[3] * -1}}, .imag = {{0}}};
 	
 	OneQubitKrausOperator operators[4] = {Pauli0, Pauli1, Pauli2, Pauli3};
-	ApplyOneQubitKrausMap(qureg, targetQubit, operators, 4);
+	applyOneQubitKrausMap(qureg, targetQubit, operators, 4);
 	
 }
 

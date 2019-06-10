@@ -1507,11 +1507,11 @@ void applyOneQubitDampingError(Qureg qureg, const int targetQubit, qreal prob);
 
 /** Add description!
 */ 
-void ApplyOneQubitKrausMap(Qureg qureg, const int targetQubit, OneQubitKrausOperator *operators, int numberOfOperators);
+void applyOneQubitKrausMap(Qureg qureg, const int targetQubit, OneQubitKrausOperator *operators, int numberOfOperators);
 
 /** Add description!
 */ 
-void ApplyOneQubitPauliChannel(Qureg qureg, const int targetQubit, qreal probX, qreal probY, qreal probZ);
+void applyOneQubitPauliChannel(Qureg qureg, const int targetQubit, qreal probX, qreal probY, qreal probZ);
 
 
 /** Mixes a density matrix \p qureg to induce two-qubit homogeneous depolarising noise.

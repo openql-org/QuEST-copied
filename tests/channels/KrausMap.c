@@ -61,7 +61,7 @@ t = clock();
 		//ApplyOneQubitDepolariseChannel(qubitsA, i, prob);
 		//ApplyOneQubitDephaseChannel(qubitsA, i, prob);
 		//ApplyOneQubitDampingChannel(qubitsA, i, prob);
-		ApplyOneQubitPauliChannel(qubitsA, i, prob/3, prob/3, prob/3);
+		applyOneQubitPauliChannel(qubitsA, i, prob/3, prob/3, prob/3);
 		//rotXtest(qubitsA, i);
 		for(int j = 0; j < N; j++) {
 			//if (i!=j) ApplyTwoQubitDephaseChannel(qubitsA, i, j,0.1);
