@@ -75,10 +75,10 @@ t = clock() - t;
 t = clock(); 
 	for(int i = 0; i < N; i++)
 	{
-		//applyOneQubitDepolariseError(qubitsB, i, prob);
+		applyOneQubitDepolariseError(qubitsB, i, prob);
 		//applyOneQubitDephaseError(qubitsB, i, prob);
 		//applyOneQubitDampingError(qubitsB, i, prob);
-		applyOneQubitDepolariseError(qubitsB, i, prob);
+		//applyOneQubitDepolariseError(qubitsB, i, prob);
 		//rotateX (qubitsB, i, 1.);
 		for(int j = 0; j < N; j++) {
 			//if (i!=j) applyTwoQubitDephaseError(qubitsB, i, j,0.1);

@@ -162,8 +162,9 @@ void ApplyOneQubitChannel_local(Qureg qureg, const int targetQubit, OneQubitSupe
 
 
 
-void KrausOperatorMultiply(OneQubitKrausOperator *A, OneQubitKrausOperator *B, OneQubitKrausOperator *C) 
+void OneQubitKrausOperatorMultiply(OneQubitKrausOperator *A, OneQubitKrausOperator *B, OneQubitKrausOperator *C) 
 { 	// This calculates the matrix product C += ConjugateTranspose(A) x B and adds the result to C
+	// This function is used in 'ValidateOneQubitKrausMap'
 	const int N = 2;
 	qreal tempAr, tempAi, tempBr, tempBi; 
     for (int i = 0; i < N; i++) { 
@@ -187,7 +188,7 @@ int ValidateOneQubitKrausMap(OneQubitKrausOperator *operators, int numberOfOpera
 		OneQubitKrausOperator id2 = {.real = {{1.,0.},{0.,1.}}, .imag = {0}};
 		
 		for (int i = 0; i < numberOfOperators; i++) {
-			KrausOperatorMultiply(&operators[i], &operators[i], &result);
+			OneQubitKrausOperatorMultiply(&operators[i], &operators[i], &result);
 		}
 		
 		qreal distance = 0., re, im;
@@ -205,7 +206,7 @@ int ValidateOneQubitKrausMap(OneQubitKrausOperator *operators, int numberOfOpera
 }
 
 
-void KrausOperator2SuperOperator(OneQubitKrausOperator *A, OneQubitKrausOperator *B, OneQubitSuperOperator *C)
+void OneQubitKrausOperator2SuperOperator(OneQubitKrausOperator *A, OneQubitKrausOperator *B, OneQubitSuperOperator *C)
 { // This calculates the tensor product      C += conjugate(A) (x) B   and adds the result to the superopertor C
     qreal tempAr, tempAi, tempBr, tempBi;
 	const int N = 2;
@@ -246,7 +247,7 @@ void ApplyOneQubitKrausMap(Qureg qureg, const int targetQubit, OneQubitKrausOper
 	
 	//turn the Kraus operators into a superoperator
 	for (int i = 0; i < numberOfOperators; i++) {
-		KrausOperator2SuperOperator(&operators[i], &operators[i], &supop);
+		OneQubitKrausOperator2SuperOperator(&operators[i], &operators[i], &supop);
 	}
 
 	//Apply the superoperator to the qubit

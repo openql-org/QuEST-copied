@@ -25,9 +25,6 @@ typedef struct TwoQubitSuperOperator
 } TwoQubitSuperOperator;
 
 
-// This calculates the superoperator from the Kraus operators A and B and adds it to the superoperator C
-void KrausOperator2SuperOperator(OneQubitKrausOperator *A, OneQubitKrausOperator *B, OneQubitSuperOperator *C);
-
 void ApplyOneQubitChannel_local(Qureg qureg, const int targetQubit, OneQubitSuperOperator supop);
 
 void ApplyOneQubitKrausMap(Qureg qureg, const int targetQubit, OneQubitKrausOperator *operators, int numberOfOperators);
