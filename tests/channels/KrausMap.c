@@ -20,7 +20,7 @@ void printrho(int N, Qureg qubits) {
 
 void HilbertSchmidtDistance(int N, Qureg qubitsA, Qureg qubitsB) {
 	qreal re,im;
-	qreal result;
+	qreal result = 0.;
 	for(int i=0; i<pow(2,N); i++) {
 	for(int j=0; j<pow(2,N); j++) {
 		re = getDensityAmp(qubitsA, i, j).real-getDensityAmp(qubitsB, i, j).real;
@@ -59,10 +59,10 @@ int main (int narg, char *varg[]) {
 t = clock();
 	for(int i = 0; i < N; i++)
 	{
-		ApplyOneQubitDepolariseChannel(qubitsA, i, prob);
+		//ApplyOneQubitDepolariseChannel(qubitsA, i, prob);
 		//ApplyOneQubitDephaseChannel(qubitsA, i, prob);
 		//ApplyOneQubitDampingChannel(qubitsA, i, prob);
-		//ApplyOneQubitUnitalChannel(qubitsA, i, prob/3., prob/3., prob/3.);
+		ApplyOneQubitPauliChannel(qubitsA, i, prob/3, prob/3, prob/3);
 		//rotXtest(qubitsA, i);
 		for(int j = 0; j < N; j++) {
 			//if (i!=j) ApplyTwoQubitDephaseChannel(qubitsA, i, j,0.1);
@@ -75,10 +75,10 @@ t = clock() - t;
 t = clock(); 
 	for(int i = 0; i < N; i++)
 	{
-		applyOneQubitDepolariseError(qubitsB, i, prob);
+		//applyOneQubitDepolariseError(qubitsB, i, prob);
 		//applyOneQubitDephaseError(qubitsB, i, prob);
 		//applyOneQubitDampingError(qubitsB, i, prob);
-		//applyOneQubitDepolariseError(qubitsB, i, prob);
+		applyOneQubitDepolariseError(qubitsB, i, prob);
 		//rotateX (qubitsB, i, 1.);
 		for(int j = 0; j < N; j++) {
 			//if (i!=j) applyTwoQubitDephaseError(qubitsB, i, j,0.1);

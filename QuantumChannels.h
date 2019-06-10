@@ -32,7 +32,7 @@ void ApplyOneQubitChannel_local(Qureg qureg, const int targetQubit, OneQubitSupe
 
 void ApplyOneQubitKrausMap(Qureg qureg, const int targetQubit, OneQubitKrausOperator *operators, int numberOfOperators);
 
-void ApplyOneQubitUnitalChannel(Qureg qureg, const int targetQubit, qreal probX, qreal probY, qreal probZ);
+void ApplyOneQubitPauliChannel(Qureg qureg, const int targetQubit, qreal probX, qreal probY, qreal probZ);
 
 void ApplyTwoQubitChannel_local(Qureg qureg, const int qubit1, const int qubit2, TwoQubitSuperOperator supop);
 

@@ -201,7 +201,7 @@ int ValidateOneQubitKrausMap(OneQubitKrausOperator *operators, int numberOfOpera
 		}
 		}
 		
-		return(distance != 0.);
+		return(fabs(distance) >= REAL_EPS);
 }
 
 
@@ -220,9 +220,10 @@ void KrausOperator2SuperOperator(OneQubitKrausOperator *A, OneQubitKrausOperator
 					tempBi = B->imag[k][l];
                     C->real[i*2 + k][j*2 + l] +=  tempAr * tempBr - tempAi * tempBi;
 					C->imag[i*2 + k][j*2 + l] +=  tempAi * tempBr + tempAr * tempBi;
-					if ( (C->imag[i*2 + k][j*2 + l] != 0.) && C->isComplex == 0)
+					if ( (fabs(C->imag[i*2 + k][j*2 + l]) >= REAL_EPS) && C->isComplex == 0)
 					{
 						C->isComplex = 1;
+						printf("Complex superoperator\n");
 					}
                 } 
             } 
@@ -254,10 +255,9 @@ void ApplyOneQubitKrausMap(Qureg qureg, const int targetQubit, OneQubitKrausOper
 }
 
 
-void ApplyOneQubitUnitalChannel(Qureg qureg, const int targetQubit, qreal probX, qreal probY, qreal probZ)
+void ApplyOneQubitPauliChannel(Qureg qureg, const int targetQubit, qreal probX, qreal probY, qreal probZ)
 {
 	// validate the probabilities here
-	// not necessary to valideate -- the resulting Kraus operators will be validated anyway
 	
 	// Turn the probabilities into Kraus operators
 	qreal prefactors[4] = {
@@ -269,7 +269,7 @@ void ApplyOneQubitUnitalChannel(Qureg qureg, const int targetQubit, qreal probX,
 	OneQubitKrausOperator Pauli0 = {.real = {{prefactors[0] * 1, 0},{0, prefactors[0] * 1}}, .imag = {0}};
 	OneQubitKrausOperator Pauli1 = {.real = {{0, prefactors[1] * 1},{prefactors[1] * 1, 0}}, .imag = {0}};
 	OneQubitKrausOperator Pauli2 = {.imag = {{0, prefactors[2] * -1},{prefactors[2] * 1, 0}}, .real = {0}};
-	OneQubitKrausOperator Pauli3 = {.real = {{prefactors[2] * 1, 0},{0, prefactors[2] * -1}}, .imag = {0}};
+	OneQubitKrausOperator Pauli3 = {.real = {{prefactors[3] * 1, 0},{0, prefactors[3] * -1}}, .imag = {0}};
 	
 	OneQubitKrausOperator operators[4] = {Pauli0, Pauli1, Pauli2, Pauli3};
 	ApplyOneQubitKrausMap(qureg, targetQubit, operators, 4);
