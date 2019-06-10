@@ -696,9 +696,9 @@ void OneQubitKrausOperator2SuperOperator(OneQubitKrausOperator *A, OneQubitKraus
 					tempAi = -A->imag[i][j]; // minus -- conjugate of A
 					tempBr = B->real[k][l];
 					tempBi = B->imag[k][l];
-                    C->real[i*2 + k][j*2 + l] +=  tempAr * tempBr - tempAi * tempBi;
-					C->imag[i*2 + k][j*2 + l] +=  tempAi * tempBr + tempAr * tempBi;
-					if ( (fabs(C->imag[i*2 + k][j*2 + l]) >= REAL_EPS) && C->isComplex == 0)
+                    C->real[i*N + k][j*N + l] +=  tempAr * tempBr - tempAi * tempBi;
+					C->imag[i*N + k][j*N + l] +=  tempAi * tempBr + tempAr * tempBi;
+					if ( (fabs(C->imag[i*N + k][j*N + l]) >= REAL_EPS) && C->isComplex == 0)
 					{
 						C->isComplex = 1;
 					}
@@ -710,7 +710,7 @@ void OneQubitKrausOperator2SuperOperator(OneQubitKrausOperator *A, OneQubitKraus
 
 void applyOneQubitKrausMap(Qureg qureg, const int targetQubit, OneQubitKrausOperator *operators, int numberOfOperators)
 {   
-	validateDensityMatrQureg(qureg, __func__);
+    validateDensityMatrQureg(qureg, __func__);
     validateTarget(qureg, targetQubit, __func__);
 	validateOneQubitKrausMap(operators, numberOfOperators, __func__);
 	
@@ -756,6 +756,52 @@ void applyTwoQubitDepolariseError(Qureg qureg, int qubit1, int qubit2, qreal pro
     
     ensureIndsIncrease(&qubit1, &qubit2);
     densmatr_twoQubitDepolarise(qureg, qubit1, qubit2, (16*prob)/15.0);
+}
+
+void TwoQubitKrausOperator2SuperOperator(TwoQubitKrausOperator *A, TwoQubitKrausOperator *B, TwoQubitSuperOperator *C)
+{ // This calculates the tensor product      C += conjugate(A) (x) B   and adds the result to the superopertor C
+  // This function is called by 'ApplyTwoQubitKrausMap'
+    qreal tempAr, tempAi, tempBr, tempBi;
+	const int N = 4;
+	
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) { 
+			for (int k = 0; k < N; k++) { 
+                for (int l = 0; l < N; l++) { 
+					tempAr = A->real[i][j];
+					tempAi = -A->imag[i][j]; // minus -- conjugate of A
+					tempBr = B->real[k][l];
+					tempBi = B->imag[k][l];
+                    C->real[i*N + k][j*N + l] +=  tempAr * tempBr - tempAi * tempBi;
+					C->imag[i*N + k][j*N + l] +=  tempAi * tempBr + tempAr * tempBi;
+					if ( (fabs(C->imag[i*N + k][j*N + l]) >= REAL_EPS) && C->isComplex == 0)
+					{
+						C->isComplex = 1;
+					}
+                } 
+            } 
+        } 
+    } 
+}
+
+void applyTwoQubitKrausMap(Qureg qureg, int qubit1, int qubit2, TwoQubitKrausOperator *operators, int numberOfOperators)
+{   
+    validateDensityMatrQureg(qureg, __func__);
+    validateUniqueTargets(qureg, qubit1, qubit2, __func__);
+    ensureIndsIncrease(&qubit1, &qubit2);
+    
+	validateTwoQubitKrausMap(operators, numberOfOperators, __func__);
+	
+	//Initialize the channel with 0 superoperator
+	TwoQubitSuperOperator supop = {.real = {{0}}, .imag = {{0}}, .isComplex = 0 };
+	
+	//turn the Kraus operators into a superoperator
+	for (int i = 0; i < numberOfOperators; i++) {
+		TwoQubitKrausOperator2SuperOperator(&operators[i], &operators[i], &supop);
+	}
+
+	//Apply the superoperator to the qubit
+	densmatr_TwoQubitChannel(qureg, qubit1, qubit2, supop);	
 }
 
 

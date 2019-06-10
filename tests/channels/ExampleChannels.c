@@ -83,41 +83,28 @@ void rotXtest(Qureg qureg, const int targetQubit)
 
 void ApplyTwoQubitDephaseChannel(Qureg qureg, const int qubit1, const int qubit2, qreal prob)
 {
-	TwoQubitSuperOperator thisSupOp = {.real = {
-{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-
-{0, 1 - (4*prob)/3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-
-{0, 0, 1 - (4*prob)/3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-
-{0, 0, 0, 1 - (4*prob)/3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-
-{0, 0, 0, 0, 1 - (4*prob)/3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-
-{0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-
-{0, 0, 0, 0, 0, 0, 1 - (4*prob)/3, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-
-{0, 0, 0, 0, 0, 0, 0, 1 - (4*prob)/3, 0, 0, 0, 0, 0, 0, 0, 0},
-
-{0, 0, 0, 0, 0, 0, 0, 0, 1 - (4*prob)/3, 0, 0, 0, 0, 0, 0, 0},
-
-{0, 0, 0, 0, 0, 0, 0, 0, 0, 1 - (4*prob)/3, 0, 0, 0, 0, 0, 0},
-
-{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-
-{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 - (4*prob)/3, 0, 0, 0, 0},
-
-{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 - (4*prob)/3, 0, 0, 0},
-
-{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 - (4*prob)/3, 0, 0},
-
-{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 - (4*prob)/3, 0},
-
-{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
-	},
-	.isComplex = 0};
-  
-  densmatr_TwoQubitChannel(qureg, qubit1, qubit2, thisSupOp);
-  
+	TwoQubitKrausOperator Pauli0AB = {.real = {
+            {sqrt(1.-prob),0.,0.,0.},
+            {0.,sqrt(1.-prob),0.,0.},
+            {0.,0.,sqrt(1.-prob),0.},
+            {0.,0.,0.,sqrt(1.-prob)}
+            }, .imag = {{0}}};
+    
+    TwoQubitKrausOperator Pauli3A ={.real = {
+        {sqrt(prob/3), 0, 0, 0}, {0, -sqrt(prob/3), 0, 0},
+        {0, 0, sqrt(prob/3), 0}, {0, 0, 0, -sqrt(prob/3)}
+        }, .imag = {{0}}};
+    
+    TwoQubitKrausOperator Pauli3B ={.real = {
+        {sqrt(prob/3), 0, 0, 0}, {0, sqrt(prob/3), 0, 0},
+        {0, 0, -sqrt(prob/3), 0}, {0, 0, 0, -sqrt(prob/3)}
+    }, .imag = {{0}}};
+    
+    TwoQubitKrausOperator Pauli3AB ={.real = {
+        {sqrt(prob/3), 0, 0, 0}, {0, -sqrt(prob/3), 0, 0},
+        {0, 0, -sqrt(prob/3), 0}, {0, 0, 0, sqrt(prob/3)}
+    }, .imag = {{0}}};
+    
+    TwoQubitKrausOperator operators[4] = {Pauli0AB, Pauli3A, Pauli3B, Pauli3AB};
+    applyTwoQubitKrausMap(qureg, qubit1, qubit2, operators, 4);
 }

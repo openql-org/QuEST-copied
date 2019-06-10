@@ -47,7 +47,8 @@ typedef enum {
     E_INVALID_ONE_QUBIT_DEPOL_PROB,
 	E_INVALID_ONE_QUBIT_PAULI_PROBS,
 	E_INVALID_ONE_QUBIT_KRAUS_OPS,
-    E_INVALID_TWO_QUBIT_DEPOL_PROB
+    E_INVALID_TWO_QUBIT_DEPOL_PROB,
+    E_INVALID_TWO_QUBIT_KRAUS_OPS
 } ErrorCode;
 
 static const char* errorMessages[] = {
@@ -80,7 +81,8 @@ static const char* errorMessages[] = {
     [E_INVALID_ONE_QUBIT_PAULI_PROBS] = "The probability of any X, Y or Z error cannot exceed the probability of no error.",
 	[E_INVALID_ONE_QUBIT_KRAUS_OPS] = "The specified Kraus map is not a completely positive, trace preserving map",
 	[E_INVALID_ONE_QUBIT_DEPOL_PROB] = "The probability of a single qubit depolarising error cannot exceed 3/4, which maximally mixes.",
-    [E_INVALID_TWO_QUBIT_DEPOL_PROB] = "The probability of a two-qubit depolarising error cannot exceed 15/16, which maximally mixes."
+    [E_INVALID_TWO_QUBIT_DEPOL_PROB] = "The probability of a two-qubit depolarising error cannot exceed 15/16, which maximally mixes.",
+    [E_INVALID_TWO_QUBIT_KRAUS_OPS] = "The specified Kraus map is not a completely positive, trace preserving map"
 };
 
 void exitWithError(ErrorCode code, const char* func){
@@ -320,7 +322,52 @@ void validateTwoQubitDepolProb(qreal prob, const char* caller) {
     QuESTAssert(prob <= 15/16.0, E_INVALID_TWO_QUBIT_DEPOL_PROB, caller);
 }
 
+void TwoQubitKrausOperatorMultiply(TwoQubitKrausOperator *A, TwoQubitKrausOperator *B, TwoQubitKrausOperator *C) 
+{ 	// This calculates the matrix product C += ConjugateTranspose(A) x B and adds the result to C
+	// This function is used in 'validateTwoQubitKrausMap'
+	const int N = 4;
+	qreal tempAr, tempAi, tempBr, tempBi; 
+    for (int i = 0; i < N; i++) { 
+        for (int j = 0; j < N; j++) { 
+            for (int k = 0; k < N; k++) {
+				tempAr = A->real[k][i];  //because it is the conjugate transpose of A
+				tempAi = -A->imag[k][i]; //because it is the conjugate transpose of A
+				tempBr = B->real[k][j];
+				tempBi = B->imag[k][j];
+				C->real[i][j] += tempAr*tempBr - tempAi*tempBi;
+				C->imag[i][j] += tempAr*tempBi + tempAi*tempBr;
+			}	 
+		}
+	}
+}
 
+void validateTwoQubitKrausMap(TwoQubitKrausOperator *operators, int numberOfOperators, const char* caller)
+{
+		const int N = 4;
+		TwoQubitKrausOperator result = {.real = {{0}}, .imag = {{0}}};
+		TwoQubitKrausOperator id4 = {.real = {
+            {1.,0.,0.,0.},
+            {0.,1.,0.,0.},
+            {0.,0.,1.,0.},
+            {0.,0.,0.,1.}
+            }, .imag = {{0}}};
+		
+		for (int i = 0; i < numberOfOperators; i++) {
+			TwoQubitKrausOperatorMultiply(&operators[i], &operators[i], &result);
+		}
+		
+		qreal distance = 0., re, im;
+		// calculate the Hilbert-Schmidt distance between the
+		// result and the identity matrix
+		for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+			re = result.real[i][j] - id4.real[i][j];
+			im = result.imag[i][j] - id4.imag[i][j];
+			distance += fabs(re)*fabs(re) + fabs(im)*fabs(im);
+		}
+		}
+		QuESTAssert(fabs(distance) <= REAL_EPS, E_INVALID_TWO_QUBIT_KRAUS_OPS, caller);
+}
 
 
 #ifdef __cplusplus

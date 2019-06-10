@@ -94,6 +94,15 @@ typedef struct OneQubitSuperOperator
 	int isComplex;
 } OneQubitSuperOperator;
 
+/** Represents an arbitrary 2-by-2 matrix
+which is used as a Kraus operator
+ */
+typedef struct TwoQubitKrausOperator
+{
+	qreal real[4][4];
+	qreal imag[4][4];
+} TwoQubitKrausOperator;
+
 /** Represents the 16-by-16 matrix that describes
 an arbitrary two-qubit process
  */
@@ -1512,6 +1521,10 @@ void applyOneQubitKrausMap(Qureg qureg, const int targetQubit, OneQubitKrausOper
 /** Add description!
 */ 
 void applyOneQubitPauliChannel(Qureg qureg, const int targetQubit, qreal probX, qreal probY, qreal probZ);
+
+/** Add description!
+*/ 
+void applyTwoQubitKrausMap(Qureg qureg, const int qubit1, const int qubit2, TwoQubitKrausOperator *operators, int numberOfOperators);
 
 
 /** Mixes a density matrix \p qureg to induce two-qubit homogeneous depolarising noise.

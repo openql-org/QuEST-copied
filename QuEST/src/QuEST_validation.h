@@ -67,6 +67,8 @@ void validateOneQubitKrausMap(OneQubitKrausOperator *operators, int numberOfOper
 
 void validateTwoQubitDepolProb(qreal prob, const char* caller);
 
+void validateTwoQubitKrausMap(TwoQubitKrausOperator *operators, int numberOfOperators, const char* caller);
+
 void validateOneQubitDampingProb(qreal prob, const char* caller);
 
 
