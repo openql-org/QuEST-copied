@@ -45,6 +45,8 @@ typedef enum {
     E_INVALID_ONE_QUBIT_DEPHASE_PROB,
     E_INVALID_TWO_QUBIT_DEPHASE_PROB,
     E_INVALID_ONE_QUBIT_DEPOL_PROB,
+	E_INVALID_ONE_QUBIT_PAULI_PROBS,
+	E_INVALID_ONE_QUBIT_KRAUS_OPS,
     E_INVALID_TWO_QUBIT_DEPOL_PROB
 } ErrorCode;
 
@@ -75,7 +77,9 @@ static const char* errorMessages[] = {
     [E_UNNORM_PROBS] = "Probabilities must sum to ~1.",
     [E_INVALID_ONE_QUBIT_DEPHASE_PROB] = "The probability of a single qubit dephase error cannot exceed 1/2, which maximally mixes.",
     [E_INVALID_TWO_QUBIT_DEPHASE_PROB] = "The probability of a two-qubit qubit dephase error cannot exceed 3/4, which maximally mixes.",
-    [E_INVALID_ONE_QUBIT_DEPOL_PROB] = "The probability of a single qubit depolarising error cannot exceed 3/4, which maximally mixes.",
+    [E_INVALID_ONE_QUBIT_PAULI_PROBS] = "The probability of any X, Y or Z error cannot exceed the probability of no error.",
+	[E_INVALID_ONE_QUBIT_KRAUS_OPS] = "The specified Kraus map is not a completely positive, trace preserving map",
+	[E_INVALID_ONE_QUBIT_DEPOL_PROB] = "The probability of a single qubit depolarising error cannot exceed 3/4, which maximally mixes.",
     [E_INVALID_TWO_QUBIT_DEPOL_PROB] = "The probability of a two-qubit depolarising error cannot exceed 15/16, which maximally mixes."
 };
 
@@ -255,6 +259,60 @@ void validateOneQubitDepolProb(qreal prob, const char* caller) {
 void validateOneQubitDampingProb(qreal prob, const char* caller) {
     validateProb(prob, caller);
     QuESTAssert(prob <= 1.0, E_INVALID_ONE_QUBIT_DEPOL_PROB, caller);
+}
+
+void validateOneQubitPauliProbs(qreal probX, qreal probY, qreal probZ, const char* caller) {
+    validateProb(probX, caller);
+    validateProb(probY, caller);
+    validateProb(probZ, caller);
+    
+    qreal probNoError = 1 - probX - probY - probZ;
+    QuESTAssert(probX <= probNoError, E_INVALID_ONE_QUBIT_PAULI_PROBS, caller);
+    QuESTAssert(probY <= probNoError, E_INVALID_ONE_QUBIT_PAULI_PROBS, caller);
+    QuESTAssert(probZ <= probNoError, E_INVALID_ONE_QUBIT_PAULI_PROBS, caller);
+}
+
+void OneQubitKrausOperatorMultiply(OneQubitKrausOperator *A, OneQubitKrausOperator *B, OneQubitKrausOperator *C) 
+{ 	// This calculates the matrix product C += ConjugateTranspose(A) x B and adds the result to C
+	// This function is used in 'ValidateOneQubitKrausMap'
+	const int N = 2;
+	qreal tempAr, tempAi, tempBr, tempBi; 
+    for (int i = 0; i < N; i++) { 
+        for (int j = 0; j < N; j++) { 
+            for (int k = 0; k < N; k++) {
+				tempAr = A->real[k][i];  //because it is the conjugate transpose of A
+				tempAi = -A->imag[k][i]; //because it is the conjugate transpose of A
+				tempBr = B->real[k][j];
+				tempBi = B->imag[k][j];
+				C->real[i][j] += tempAr*tempBr - tempAi*tempBi;
+				C->imag[i][j] += tempAr*tempBi + tempAi*tempBr;
+			}	 
+		}
+	}
+} 
+
+void validateOneQubitKrausMap(OneQubitKrausOperator *operators, int numberOfOperators, const char* caller)
+{
+		const int N = 2;
+		OneQubitKrausOperator result = {.real = {{0}}, .imag = {{0}}};
+		OneQubitKrausOperator id2 = {.real = {{1.,0.},{0.,1.}}, .imag = {{0}}};
+		
+		for (int i = 0; i < numberOfOperators; i++) {
+			OneQubitKrausOperatorMultiply(&operators[i], &operators[i], &result);
+		}
+		
+		qreal distance = 0., re, im;
+		// calculate the Hilbert-Schmidt distance between the
+		// result and the identity matrix
+		for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+			re = result.real[i][j] - id2.real[i][j];
+			im = result.imag[i][j] - id2.imag[i][j];
+			distance += fabs(re)*fabs(re) + fabs(im)*fabs(im);
+		}
+		}
+		
+		QuESTAssert(fabs(distance) <= REAL_EPS, E_INVALID_ONE_QUBIT_KRAUS_OPS, caller);
 }
 
 void validateTwoQubitDepolProb(qreal prob, const char* caller) {

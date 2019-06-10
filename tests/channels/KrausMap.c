@@ -1,4 +1,3 @@
-#include "../../QuantumChannels.h"
 #include "ExampleChannels.h"
 #include <time.h> 
 

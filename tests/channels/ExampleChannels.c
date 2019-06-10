@@ -18,7 +18,7 @@ void ApplyOneQubitDephaseChannel(Qureg qureg, const int targetQubit, qreal prob)
 	//CalculateOneQubitSparseSuperOperator(&thisChannel);
 	
 	//Apply channel to the qubit
-	ApplyOneQubitChannel_local(qureg, targetQubit, supop);	
+	densmatr_OneQubitChannel(qureg, targetQubit, supop);	
 }	
 
 
@@ -38,7 +38,7 @@ void ApplyOneQubitDepolariseChannel(Qureg qureg, const int targetQubit, qreal pr
 	};
 	
 	//ApplyOneQubitChannel_local(qureg, targetQubit, thisChannel.SparseSupOp);	
-	ApplyOneQubitChannel_local(qureg, targetQubit, supop);	
+	densmatr_OneQubitChannel(qureg, targetQubit, supop);	
 }	
 
 
@@ -56,7 +56,7 @@ void ApplyOneQubitDampingChannel(Qureg qureg, const int targetQubit, qreal prob)
 	};
 	
 	//Apply channel to the qubit
-	ApplyOneQubitChannel_local(qureg, targetQubit, supop);	
+	densmatr_OneQubitChannel(qureg, targetQubit, supop);	
 }
 
 void rotXtest(Qureg qureg, const int targetQubit)
@@ -77,7 +77,7 @@ void rotXtest(Qureg qureg, const int targetQubit)
 	};
 	
 	//Apply channel to the qubit
-	ApplyOneQubitChannel_local(qureg, targetQubit, supop);	
+	densmatr_OneQubitChannel(qureg, targetQubit, supop);	
 }
 
 
@@ -118,6 +118,6 @@ void ApplyTwoQubitDephaseChannel(Qureg qureg, const int qubit1, const int qubit2
 	},
 	.isComplex = 0};
   
-  ApplyTwoQubitChannel_local(qureg, qubit1, qubit2, thisSupOp);
+  densmatr_TwoQubitChannel(qureg, qubit1, qubit2, thisSupOp);
   
 }

@@ -1,8 +1,8 @@
 #ifndef ExampleChannels_H
 #define ExampleChannels_H
 
-#include "../../QuantumChannels.h"
 #include "QuEST.h"
+#include "../../QuEST/src/QuEST_internal.h"
 #include <stdio.h>
 
 void ApplyOneQubitDephaseChannel(Qureg qureg, const int targetQubit, qreal prob);

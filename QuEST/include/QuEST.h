@@ -75,6 +75,35 @@ typedef struct Vector
     qreal x, y, z;
 } Vector;
 
+/** Represents an arbitrary 2-by-2 matrix
+which is used as a Kraus operator
+ */
+typedef struct OneQubitKrausOperator
+{
+	qreal real[2][2];
+	qreal imag[2][2];
+} OneQubitKrausOperator;
+
+/** Represents the 4-by-4 matrix that describes
+an arbitrary single-qubit process
+ */
+typedef struct OneQubitSuperOperator
+{
+	qreal real[4][4];
+	qreal imag[4][4];
+	int isComplex;
+} OneQubitSuperOperator;
+
+/** Represents the 16-by-16 matrix that describes
+an arbitrary two-qubit process
+ */
+typedef struct TwoQubitSuperOperator
+{
+	qreal real[16][16];
+	qreal imag[16][16];
+	int isComplex;
+} TwoQubitSuperOperator;
+
 /** Represents a system of qubits.
  * Qubits are zero-based
  */
@@ -1475,6 +1504,15 @@ void applyOneQubitDepolariseError(Qureg qureg, const int targetQubit, qreal prob
  *      or if \p prob is not in [0, 1]
  */
 void applyOneQubitDampingError(Qureg qureg, const int targetQubit, qreal prob);
+
+/** Add description!
+*/ 
+void ApplyOneQubitKrausMap(Qureg qureg, const int targetQubit, OneQubitKrausOperator *operators, int numberOfOperators);
+
+/** Add description!
+*/ 
+void ApplyOneQubitPauliChannel(Qureg qureg, const int targetQubit, qreal probX, qreal probY, qreal probZ);
+
 
 /** Mixes a density matrix \p qureg to induce two-qubit homogeneous depolarising noise.
  * With probability \p prob, applies to \p qubit1 and \p qubit2 any operator of the set

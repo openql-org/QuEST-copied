@@ -70,6 +70,10 @@ void densmatr_oneQubitDepolarise(Qureg qureg, const int targetQubit, qreal depol
 
 void densmatr_oneQubitDamping(Qureg qureg, const int targetQubit, qreal damping);
 
+void densmatr_OneQubitChannel(Qureg qureg, const int targetQubit, OneQubitSuperOperator supop);
+
+void densmatr_TwoQubitChannel(Qureg qureg, const int qubit1, const int qubit2, TwoQubitSuperOperator supop);
+
 void densmatr_twoQubitDepolarise(Qureg qureg, int qubit1, int qubit2, qreal depolLevel);
 
 void densmatr_addDensityMatrix(Qureg combineQureg, qreal otherProb, Qureg otherQureg);

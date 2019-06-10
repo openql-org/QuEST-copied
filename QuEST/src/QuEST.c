@@ -682,6 +682,73 @@ void applyOneQubitDampingError(Qureg qureg, const int targetQubit, qreal prob) {
     densmatr_oneQubitDamping(qureg, targetQubit, prob);
 }
 
+void OneQubitKrausOperator2SuperOperator(OneQubitKrausOperator *A, OneQubitKrausOperator *B, OneQubitSuperOperator *C)
+{ // This calculates the tensor product      C += conjugate(A) (x) B   and adds the result to the superopertor C
+  // This function is called by 'ApplyOneQubitKrausMap'
+    qreal tempAr, tempAi, tempBr, tempBi;
+	const int N = 2;
+	
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) { 
+			for (int k = 0; k < N; k++) { 
+                for (int l = 0; l < N; l++) { 
+					tempAr = A->real[i][j];
+					tempAi = -A->imag[i][j]; // minus -- conjugate of A
+					tempBr = B->real[k][l];
+					tempBi = B->imag[k][l];
+                    C->real[i*2 + k][j*2 + l] +=  tempAr * tempBr - tempAi * tempBi;
+					C->imag[i*2 + k][j*2 + l] +=  tempAi * tempBr + tempAr * tempBi;
+					if ( (fabs(C->imag[i*2 + k][j*2 + l]) >= REAL_EPS) && C->isComplex == 0)
+					{
+						C->isComplex = 1;
+					}
+                } 
+            } 
+        } 
+    } 
+}
+
+void ApplyOneQubitKrausMap(Qureg qureg, const int targetQubit, OneQubitKrausOperator *operators, int numberOfOperators)
+{   
+	validateDensityMatrQureg(qureg, __func__);
+    validateTarget(qureg, targetQubit, __func__);
+	validateOneQubitKrausMap(operators, numberOfOperators, __func__);
+	
+	//Initialize the channel with 0 superoperator
+	OneQubitSuperOperator supop = {.real = {{0}}, .imag = {{0}}, .isComplex = 0 };
+	
+	//turn the Kraus operators into a superoperator
+	for (int i = 0; i < numberOfOperators; i++) {
+		OneQubitKrausOperator2SuperOperator(&operators[i], &operators[i], &supop);
+	}
+
+	//Apply the superoperator to the qubit
+	densmatr_OneQubitChannel(qureg, targetQubit, supop);	
+}
+
+void ApplyOneQubitPauliChannel(Qureg qureg, const int targetQubit, qreal probX, qreal probY, qreal probZ)
+{
+	validateDensityMatrQureg(qureg, __func__);
+    validateTarget(qureg, targetQubit, __func__);
+    validateOneQubitPauliProbs(probX, probY, probZ, __func__);
+	
+	// Turn the probabilities into Kraus operators
+	qreal prefactors[4] = {
+		sqrt(1-(probX + probY + probZ)),
+		sqrt(probX),
+		sqrt(probY),
+		sqrt(probZ)
+	};
+	OneQubitKrausOperator Pauli0 = {.real = {{prefactors[0] * 1, 0},{0, prefactors[0] * 1}}, .imag = {{0}}};
+	OneQubitKrausOperator Pauli1 = {.real = {{0, prefactors[1] * 1},{prefactors[1] * 1, 0}}, .imag = {{0}}};
+	OneQubitKrausOperator Pauli2 = {.imag = {{0, prefactors[2] * -1},{prefactors[2] * 1, 0}}, .real = {{0}}};
+	OneQubitKrausOperator Pauli3 = {.real = {{prefactors[3] * 1, 0},{0, prefactors[3] * -1}}, .imag = {{0}}};
+	
+	OneQubitKrausOperator operators[4] = {Pauli0, Pauli1, Pauli2, Pauli3};
+	ApplyOneQubitKrausMap(qureg, targetQubit, operators, 4);
+	
+}
+
 void applyTwoQubitDepolariseError(Qureg qureg, int qubit1, int qubit2, qreal prob) {
     validateDensityMatrQureg(qureg, __func__);
     validateUniqueTargets(qureg, qubit1, qubit2, __func__);
