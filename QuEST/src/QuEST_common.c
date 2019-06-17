@@ -1,4 +1,4 @@
-// Distributed under MIT licence. See https://github.com/QuEST-Kit/QuEST/blob/master/LICENCE.txt for details
+﻿// Distributed under MIT licence. See https://github.com/QuEST-Kit/QuEST/blob/master/LICENCE.txt for details
 
 /** @file
  * Internal and API functions which are hardware-agnostic.
@@ -17,9 +17,7 @@
 # include "QuEST_validation.h"
 # include "mt19937ar.h"
 
-# include <unistd.h>
 # include <sys/types.h> 
-# include <sys/time.h>
 # include <stdio.h>
 # include <stdlib.h>
 
@@ -177,16 +175,8 @@ void getQuESTDefaultSeedKey(unsigned long int *key){
     // for the MPI version, it is ok that all procs will get the same seed as random numbers will only be 
     // used by the master process
 
-    struct timeval  tv;
-    gettimeofday(&tv, NULL);
-
-    double time_in_mill =
-        (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ; // convert tv_sec & tv_usec to millisecond
-
-    unsigned long int pid = getpid();
-    unsigned long int msecs = (unsigned long int) time_in_mill;
-
-    key[0] = msecs; key[1] = pid;
+    // monkey patch by TJ for compiling on Windows
+    key[0] = 42; key[1] = 666;
 }
 
 /** 

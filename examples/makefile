@@ -27,10 +27,10 @@ SOURCES = tutorial_example
 QUEST_DIR = QuEST
 
 # compiler to use, which should support both C and C++, to be wrapped by GPU/MPI compilers
-COMPILER = gcc
+COMPILER = icl
 
 # type of above compiler, one of {GNU, INTEL, CLANG}, used for setting compiler flags
-COMPILER_TYPE = GNU
+COMPILER_TYPE = INTEL
 
 # hardwares to target: 1 means use, 0 means don't use
 MULTITHREADED = 0
@@ -168,7 +168,7 @@ QUEST_INCLUDE = -I${QUEST_INCLUDE_DIR} -I$(QUEST_INNER_DIR) -I$(QUEST_COMMON_DIR
 #
 
 CUDA_COMPILER = nvcc
-MPI_COMPILER = mpicc
+MPI_COMPILER = mpiicc
 
 
 
@@ -234,7 +234,8 @@ endif
 # --- compiler environment vars
 #
 
-MPI_WRAPPED_COMP = I_MPI_CC=$(COMPILER) OMPI_CC=$(COMPILER) MPICH_CC=$(COMPILER)
+MPI_WRAPPED_COMP = -cc=$(COMPILER) -cxx=$(COMPILER)
+
 
 
 
@@ -242,15 +243,15 @@ MPI_WRAPPED_COMP = I_MPI_CC=$(COMPILER) OMPI_CC=$(COMPILER) MPICH_CC=$(COMPILER)
 # --- targets
 #
 
-OBJ = QuEST.o QuEST_validation.o QuEST_common.o QuEST_qasm.o mt19937ar.o
+OBJ = QuEST.obj QuEST_validation.obj QuEST_common.obj QuEST_qasm.obj mt19937ar.obj
 ifeq ($(GPUACCELERATED), 1)
-    OBJ += QuEST_gpu.o
+    OBJ += QuEST_gpu.obj
 else ifeq ($(DISTRIBUTED), 1)
-    OBJ += QuEST_cpu.o QuEST_cpu_distributed.o
+    OBJ += QuEST_cpu.obj QuEST_cpu_distributed.obj
 else
-    OBJ += QuEST_cpu.o QuEST_cpu_local.o
+    OBJ += QuEST_cpu.obj QuEST_cpu_local.obj
 endif
-OBJ += $(addsuffix .o, $(SOURCES))
+OBJ += $(addsuffix .obj, $(SOURCES))
 
 
 
@@ -267,51 +268,51 @@ OBJ += $(addsuffix .o, $(SOURCES))
 # GPU
 ifeq ($(GPUACCELERATED), 1)
 
-  %.o: %.c
+  %.obj: %.c
 	$(COMPILER) -x c $(C_FLAGS) $(QUEST_INCLUDE) -c $<
-  %.o: $(QUEST_INNER_DIR)/%.c
+  %.obj: $(QUEST_INNER_DIR)/%.c
 	$(COMPILER) -x c $(C_FLAGS) $(QUEST_INCLUDE) -c $<
-  %.o: $(QUEST_COMMON_DIR)/%.c
+  %.obj: $(QUEST_COMMON_DIR)/%.c
 	$(COMPILER) -x c $(C_FLAGS) $(QUEST_INCLUDE) -c $<
 
-  %.o: %.cu
+  %.obj: %.cu
 	$(CUDA_COMPILER) -dc $(CPP_CUDA_FLAGS) $(QUEST_INCLUDE) $<
-  %.o: $(QUEST_INNER_DIR)/%.cu
+  %.obj: $(QUEST_INNER_DIR)/%.cu
 	$(CUDA_COMPILER) -dc $(CPP_CUDA_FLAGS) $(QUEST_INCLUDE) $<
 	
-  %.o: %.cpp
+  %.obj: %.cpp
 	$(CUDA_COMPILER) -dc $(CPP_CUDA_FLAGS) $(QUEST_INCLUDE) $<
-  %.o: $(QUEST_INNER_DIR)/%.cpp
+  %.obj: $(QUEST_INNER_DIR)/%.cpp
 	$(CUDA_COMPILER) -dc $(CPP_CUDA_FLAGS) $(QUEST_INCLUDE) $<
 
 # distributed
 else ifeq ($(DISTRIBUTED), 1)
 
-  %.o: %.c
-	$(MPI_WRAPPED_COMP) $(MPI_COMPILER) -x c $(C_FLAGS) $(QUEST_INCLUDE) -c $<
-  %.o: $(QUEST_INNER_DIR)/%.c
-	$(MPI_WRAPPED_COMP) $(MPI_COMPILER) -x c $(C_FLAGS) $(QUEST_INCLUDE) -c $<
-  %.o: $(QUEST_COMMON_DIR)/%.c
-	$(MPI_WRAPPED_COMP) $(MPI_COMPILER) -x c $(C_FLAGS) $(QUEST_INCLUDE) -c $<
+  %.obj: %.c
+	$(MPI_COMPILER) $(MPI_WRAPPED_COMP) -x c $(C_FLAGS) $(QUEST_INCLUDE) -c $<
+  %.obj: $(QUEST_INNER_DIR)/%.c
+	$(MPI_COMPILER) $(MPI_WRAPPED_COMP) -x c $(C_FLAGS) $(QUEST_INCLUDE) -c $<
+  %.obj: $(QUEST_COMMON_DIR)/%.c
+	$(MPI_COMPILER) $(MPI_WRAPPED_COMP) -x c $(C_FLAGS) $(QUEST_INCLUDE) -c $<
 	
-  %.o: %.cpp
-	$(MPI_WRAPPED_COMP) $(MPI_COMPILER) $(CPP_FLAGS) $(QUEST_INCLUDE) -c $<
-  %.o: $(QUEST_INNER_DIR)/%.cpp
-	$(MPI_WRAPPED_COMP) $(MPI_COMPILER) $(CPP_FLAGS) $(QUEST_INCLUDE) -c $<
+  %.obj: %.cpp
+	$(MPI_COMPILER) $(MPI_WRAPPED_COMP) $(CPP_FLAGS) $(QUEST_INCLUDE) -c $<
+  %.obj: $(QUEST_INNER_DIR)/%.cpp
+	$(MPI_COMPILER) $(MPI_WRAPPED_COMP) $(CPP_FLAGS) $(QUEST_INCLUDE) -c $<
 
 # CPU
 else
 
-  %.o: %.c
+  %.obj: %.c
 	$(COMPILER) -x c $(C_FLAGS) $(QUEST_INCLUDE) -c $<
-  %.o: $(QUEST_INNER_DIR)/%.c
+  %.obj: $(QUEST_INNER_DIR)/%.c
 	$(COMPILER) -x c $(C_FLAGS) $(QUEST_INCLUDE) -c $<
-  %.o: $(QUEST_COMMON_DIR)/%.c
+  %.obj: $(QUEST_COMMON_DIR)/%.c
 	$(COMPILER) -x c $(C_FLAGS) $(QUEST_INCLUDE) -c $<
 	
-  %.o: %.cpp
+  %.obj: %.cpp
 	$(COMPILER) $(CPP_FLAGS) $(QUEST_INCLUDE) -c $<
-  %.o: $(QUEST_INNER_DIR)/%.cpp
+  %.obj: $(QUEST_INNER_DIR)/%.cpp
 	$(COMPILER) $(CPP_FLAGS)  -c $<
 
 endif
@@ -333,7 +334,7 @@ else ifeq ($(DISTRIBUTED), 1)
 
   default:	$(EXE)
   $(EXE):	$(OBJ)
-			$(MPI_WRAPPED_COMP) $(MPI_COMPILER) $(C_FLAGS) $(QUEST_INCLUDE) -o $(EXE) $(OBJ) $(LIBS) 
+			$(MPI_COMPILER) $(MPI_WRAPPED_COMP) $(C_FLAGS) $(QUEST_INCLUDE) -o $(EXE) $(OBJ) $(LIBS) 
 
 # C
 else
@@ -354,9 +355,9 @@ test: $(OBJ)
 
 .PHONY:		clean veryclean
 clean:
-			/bin/rm -f *.o $(EXE)
+			del -f *.obj $(EXE)
 veryclean:	clean
-			/bin/rm -f *.h~ *.c~ makefile~
+			del -f *.h~ *.c~ makefile~
 
 
 
