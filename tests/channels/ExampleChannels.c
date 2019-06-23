@@ -108,3 +108,17 @@ void ApplyTwoQubitDephaseChannel(Qureg qureg, const int qubit1, const int qubit2
     TwoQubitKrausOperator operators[4] = {Pauli0AB, Pauli3A, Pauli3B, Pauli3AB};
     applyTwoQubitKrausMap(qureg, qubit1, qubit2, operators, 4);
 }
+
+
+void ApplySwapChannel(Qureg qureg, const int qubit1, const int qubit2)
+{
+	TwoQubitKrausOperator swap = {.real = {
+            {1.,0.,0.,0.},
+            {0.,0.,1.,0.},
+            {0.,1.,0.,0.},
+            {0.,0.,0.,1.}
+            }, .imag = {{0}}};
+    
+    TwoQubitKrausOperator operators[1] = {swap};
+    applyTwoQubitKrausMap(qureg, qubit1, qubit2, operators, 1);
+}

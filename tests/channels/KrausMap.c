@@ -65,6 +65,9 @@ t = clock();
         //rotXtest(qubitsA, i);
         for(int j = 0; j < N; j++) {
             if (i!=j) ApplyTwoQubitDephaseChannel(qubitsA, i, j, 0.1);
+			if (i!=j) ApplySwapChannel(qubitsA, i, j);
+			printf("Prob is: %g \n", calcTotalProb(qubitsA));
+			if (i!=j) ApplySwapChannel(qubitsA, i, j);
         }
     } 
 t = clock() - t; 

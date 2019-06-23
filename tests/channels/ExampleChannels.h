@@ -15,4 +15,6 @@ void ApplyTwoQubitDephaseChannel(Qureg qureg, const int qubit1, const int qubit2
 
 void rotXtest(Qureg qureg, const int targetQubit);
 
+void ApplySwapChannel(Qureg qureg, const int qubit1, const int qubit2);
+
 #endif
