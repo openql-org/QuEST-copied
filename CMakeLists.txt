@@ -8,12 +8,20 @@ project(QuEST_Project)
 # ----- USER OPTIONS ----------------------------------------------------------
 # -----------------------------------------------------------------------------
 
-set(USER_SOURCE  "tutorial_example.c"  CACHE STRING "Source to build with QuEST library")
+set(USER_SOURCE  "examples/tutorial_example.c"  CACHE STRING "Source to build with QuEST library")
+#set(USER_SOURCE  "examples/damping_example.c"  CACHE STRING "Source to build with QuEST library")
 set(OUTPUT_EXE   "demo"  CACHE STRING "Executable to compile to")
 
 option(TESTING "Enable test suite functionality -- requires test suite available" ON)
 set(QuEST_UTIL_DIR_NAME "utilities" CACHE STRING
   "Name of the directory containing the QuEST utilities.")
+set(CMAKE_C_COMPILER riscv32-unknown-elf-gcc)
+set(CMAKE_CXX_COMPILER riscv32-unknown-elf-g++)
+set(CMAKE_FIND_ROOT_PATH /home/siprop/work/riscv)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)     # use CMAKE_FIND_ROOT_PATH for library
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)     # use CMAKE_FIND_ROOT_PATH for include
+set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
+set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
 
 # -----------------------------------------------------------------------------
 # ----- QuEST LIBRARY ---------------------------------------------------------
