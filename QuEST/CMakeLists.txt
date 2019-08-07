@@ -20,7 +20,7 @@
 #   cmake -DDISTRIBUTED=1 ..
 
 
-option(MULTITHREADED "Switches on OpenMP Threading if an OpenMP implementation can be found. Set to 0 to disable." 1)
+option(MULTITHREADED "Switches on OpenMP Threading if an OpenMP implementation can be found. Set to 0 to disable." 0)
 
 option(DISTRIBUTED "Whether the program will be run in distributed mode using MPI. Set to 1 to enable" 0)
 
@@ -180,12 +180,12 @@ set(CMAKE_C_FLAGS_DEBUG
 if ("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
   # using Clang
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
-    -mavx -Wall"
+    -Wall"
   )
 elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
   # using GCC
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
-    -mavx -Wall"
+    -Wall"
   )
 elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "Intel")
   # using Intel
@@ -224,12 +224,12 @@ set(CMAKE_CXX_FLAGS_DEBUG
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   # using Clang
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
-    -mavx"
+    "
   )
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   # using GCC
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
-    -mavx"
+    "
   )
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
   # using Intel
@@ -271,7 +271,7 @@ if (GPUACCELERATED)
         ${QuEST_SRC}
     )
 else ()
-    add_library(QuEST SHARED
+	add_library(QuEST STATIC
         ${QuEST_SRC}
     )
 endif()
