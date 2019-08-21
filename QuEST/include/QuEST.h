@@ -500,6 +500,15 @@ void multiControlledPhaseFlip(Qureg qureg, int *controlQubits, int numControlQub
  */
 void sGate(Qureg qureg, const int targetQubit);
 
+/** Apply the single-qubit S^{dagger} gate.
+ * This is a rotation of \f$-\pi/2\f$ around the Z-axis on the Bloch sphere, or the unitary:
+ *
+ * @param[in,out] qureg object representing the set of all qubits
+ * @param[in] targetQubit qubit to operate upon
+ * @throws exitWithError if \p targetQubit is outside [0, \p qureg.numQubitsRepresented)
+ */
+void sdgGate(Qureg qureg, const int targetQubit);
+
 /** Apply the single-qubit T gate.
  * This is a rotation of \f$\pi/4\f$ around the Z-axis on the Bloch sphere, or the unitary:
  * \f[
@@ -528,6 +537,15 @@ void sGate(Qureg qureg, const int targetQubit);
  * @throws exitWithError if \p targetQubit is outside [0, \p qureg.numQubitsRepresented)
  */
 void tGate(Qureg qureg, const int targetQubit);
+
+/** Apply the single-qubit T^{dagger} gate.
+ * This is a rotation of \f$-\pi/4\f$ around the Z-axis on the Bloch sphere, or the unitary:
+ *
+ * @param[in,out] qureg object representing the set of all qubits
+ * @param[in] targetQubit qubit to operate upon
+ * @throws exitWithError if \p targetQubit is outside [0, \p qureg.numQubitsRepresented)
+ */
+void tdgGate(Qureg qureg, const int targetQubit);
 
 /** Create the QuEST execution environment.
  * This should be called only once, and the environment should be freed with destroyQuESTEnv at the end

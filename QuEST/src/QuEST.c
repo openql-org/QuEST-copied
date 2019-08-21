@@ -375,7 +375,7 @@ void sdgGate(Qureg qureg, const int targetQubit) {
         statevec_sGate(qureg, targetQubit+qureg.numQubitsRepresented);
     }
     
-    qasm_recordGate(qureg, GATE_S, targetQubit);
+    qasm_recordGate(qureg, GATE_S_DAG, targetQubit);
 }
 
 void tdgGate(Qureg qureg, const int targetQubit) {
@@ -386,7 +386,7 @@ void tdgGate(Qureg qureg, const int targetQubit) {
         statevec_tGate(qureg, targetQubit+qureg.numQubitsRepresented);
     }
     
-    qasm_recordGate(qureg, GATE_T, targetQubit);
+    qasm_recordGate(qureg, GATE_T_DAG, targetQubit);
 }
 
 void phaseShift(Qureg qureg, const int targetQubit, qreal angle) {
