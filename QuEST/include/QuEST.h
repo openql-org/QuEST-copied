@@ -202,6 +202,15 @@ int getNumQubits(Qureg qureg);
  */
 int getNumAmps(Qureg qureg);
 
+
+/**
+ * Initialise a set of \f$ N \f$ qubits to the classical zero state 
+ * \f$ {| 0 \rangle}^{\otimes N} \f$.
+ *
+ * @param[in,out] qureg the object representing the set of all qubits to initialise
+ */
+void initZeroStateOfSingleQubit(Qureg qureg, int qubitId);
+
 /**
  * Initialise a set of \f$ N \f$ qubits to the classical zero state 
  * \f$ {| 0 \rangle}^{\otimes N} \f$.

@@ -95,6 +95,12 @@ void initZeroState(Qureg qureg) {
     qasm_recordInitZero(qureg);
 }
 
+void initZeroStateOfSingleQubit(Qureg qureg, int qubitId) {
+    validateStateVecQureg(qureg, __func__);
+    validateTarget(qureg, qubitId, __func__);
+    return statevec_initStateOfSingleQubit(&qureg, qubitId, 0);
+}
+
 void initPlusState(Qureg qureg) {
     if (qureg.isDensityMatrix)
         densmatr_initPlusState(qureg);
